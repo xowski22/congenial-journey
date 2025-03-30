@@ -35,6 +35,29 @@ class PointCloudEncoder(nn.Module):
 class PointCloudDecoder(nn.Module):
     def __init__(self, latent_dim=256, num_points=2048):
         super().__init__()
+        self.num_points = num_points
+
+        self.fc1 = nn.Linear(latent_dim, 256)
+        self.fc2 = nn.Linear(256, 512)
+        self.fc3 = nn.Linear(512, 1024)
+        self.fc4 = nn.Linear(1024, num_points*3)
+
+        self.bn1 = nn.BatchNorm1d(256)
+        self.bn2 = nn.BatchNorm1d(512)
+        self.bn3 = nn.BatchNorm1d(1024)
+
+    def forward(self, x):
+        x = F.relu(self.bn1(self.fc1(x)))
+        x = F.relu(self.bn2(self.fc2(x)))
+        x = F.relu(self.bn3(self.fc3(x)))
+        x = self.fc4(x)
+
+        x = x.view(-1, self.num_points, 3)
+        return x
+
+class PointCloudAutoencoder(nn.Module):
+    def __init__(self, latent_dim=256, num_points=2048):
+        super().__init__()
         self.encoder = PointCloudEncoder(latent_dim)
         self.decoder = PointCloudDecoder(latent_dim, num_points)
 
@@ -42,3 +65,4 @@ class PointCloudDecoder(nn.Module):
         lantent = self.encoder(x)
         reconstruction = self.decoder(lantent)
         return reconstruction, lantent
+

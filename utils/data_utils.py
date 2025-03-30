@@ -38,12 +38,12 @@ class MeshDataset(Dataset):
 
         return points_tensor
 
-    def get_dataloader(config):
-        dataset = MeshDataset(config.data_dir)
-        dataloader = DataLoader(
+def get_dataloader(config):
+    dataset = MeshDataset(config.data_dir)
+    dataloader = DataLoader(
             dataset,
             batch_size= config.batch_size,
             shuffle=True,
             num_workers=config.num_workers
-        )
-        return dataloader
+    )
+    return dataloader
