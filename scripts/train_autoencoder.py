@@ -30,3 +30,7 @@ def chamfer_distance(x, y):
     chamfer_dist = torch.mean(min_dist_x, dim=1) + torch.mean(min_dist_y, dim=1)
 
     return torch.mean(chamfer_dist)
+
+def train(config):
+    os.makedirs(config.log_dir, exist_ok=True)
+    os.makedirs(config.save_dir, exist_ok=True)
