@@ -34,3 +34,24 @@ def chamfer_distance(x, y):
 def train(config):
     os.makedirs(config.log_dir, exist_ok=True)
     os.makedirs(config.save_dir, exist_ok=True)
+
+    model = PointCloudAutoencoder(config)
+    model = model.to(config.device)
+
+    optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
+    dataloader = get_dataloader(config)
+    writer = SummaryWriter(log_dir=config.log_dir)
+
+    global_step = 0
+
+    for epoch in range(config.num_epochs):
+        model.train()
+        epoch_loss = 0
+
+        progress_bar = tqdm(dataloader, desc=f"Epoch {epoch + 1}/{config.num_epochs}")
+        for batch in progress_bar:
+            batch =batch.to(config.device)
+
+            reconstruction, latent = model(batch)
+            loss = chamfer_distance(batch, reconstruction)
+
