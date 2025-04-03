@@ -55,3 +55,42 @@ def train(config):
             reconstruction, latent = model(batch)
             loss = chamfer_distance(batch, reconstruction)
 
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss += loss.item()
+            progress_bar.set_postfix({"loss": loss.item()})
+
+            writer.add_scalar("train/loss", loss.item(), global_step)
+            global_step += 1
+
+        avg_loss = epoch_loss / len(dataloader)
+        print(f"Epoch {epoch + 1}/{config.num_epochs} Loss: {avg_loss:.6f}")
+        writer.add_scalar("train/loss", avg_loss, global_step)
+
+        if (epoch+1) % 10 == 0:
+            checkpoint_path = os.path.join(config.save_dir, f"model_epoch_{epoch+1}.pth")
+            torch.save({
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "loss": avg_loss,
+            }, checkpoint_path)
+
+            with torch.no_grad():
+                model.eval()
+                sample_batch = next(iter(dataloader)).to(config.device)
+                reconstruction, _ = model(sample_batch)
+
+                sample_batch = sample_batch.cpu()
+                reconstruction = reconstruction.cpu()
+
+                for i in range(min(4, sample_batch.shape[0])):
+                    writer.add_mesh(f"original_{i}", vertices=sample_batch[i].usqueeze(0), global_step=epoch)
+                    writer.add_mesh(f"reconstruction_{i}", vertices=reconstruction[i].squeeze(0), global_step=epoch)
+
+
+if __name__ == "__main__":
+    config = BaseConfig()
+    train(config)
