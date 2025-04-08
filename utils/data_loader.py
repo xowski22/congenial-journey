@@ -17,3 +17,18 @@ class ShapeNetDataset(Dataset):
         mesh_paths = []
 
         return mesh_paths
+
+    def __len__(self):
+        return len(self.mesh_paths)
+
+    def __getitem__(self, idx):
+        mesh_path = self.mesh_paths[idx]
+        mesh = trimesh.load(mesh_path)
+        points = mesh.sample(self.npoints)
+
+        points_tensor = torch.tensor(points, dtype=torch.float32)
+
+        if self.transform:
+            points_tensor = self.transform(points_tensor)
+
+        return points_tensor
