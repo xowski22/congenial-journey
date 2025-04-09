@@ -66,3 +66,11 @@ class PointCloudAutoencoder(nn.Module):
         reconstruction = self.decoder(lantent)
         return reconstruction, lantent
 
+class PointCloudVAE(nn.Module):
+
+    def __init__(self, latent_dim=256, num_points=2048):
+        super().__init__()
+        self.encoder_base = PointCloudEncoder(latent_dim)
+        self.fc_mu = nn.Linear(512, latent_dim)
+        self.fc_logvar = nn.Linear(512, latent_dim)
+        self.decoder = PointCloudDecoder(latent_dim, num_points)
