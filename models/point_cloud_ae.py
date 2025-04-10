@@ -74,3 +74,9 @@ class PointCloudVAE(nn.Module):
         self.fc_mu = nn.Linear(512, latent_dim)
         self.fc_logvar = nn.Linear(512, latent_dim)
         self.decoder = PointCloudDecoder(latent_dim, num_points)
+
+    def encode(self, x):
+        features = self.encoder_base(x)
+        mu = self.fc_mu(features)
+        logvar = self.fc_logvar(features)
+        return mu, logvar
