@@ -80,3 +80,14 @@ class PointCloudVAE(nn.Module):
         mu = self.fc_mu(features)
         logvar = self.fc_logvar(features)
         return mu, logvar
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5*logvar)
+        eps = torch.randn_like(std)
+        return mu + eps*std
+
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        reconstruction = self.decoder(z)
+        return reconstruction, mu, logvar
