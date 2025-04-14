@@ -31,6 +31,9 @@ def chamfer_distance(x, y):
 
     return torch.mean(chamfer_dist)
 
+def vae_loss():
+    pass
+
 def train(config):
     os.makedirs(config.log_dir, exist_ok=True)
     os.makedirs(config.save_dir, exist_ok=True)
