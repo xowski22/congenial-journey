@@ -31,8 +31,14 @@ def chamfer_distance(x, y):
 
     return torch.mean(chamfer_dist)
 
-def vae_loss():
-    pass
+def vae_loss(reconstruction, original, mu, logvar, chamfer_weight=1.0):
+    chamfer = chamfer_distance(original, reconstruction)
+
+    kl_loss = -0.5 + torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+
+    total_loss = chamfer_weight * chamfer + kl_loss
+
+    return total_loss, chamfer, kl_loss
 
 def train(config):
     os.makedirs(config.log_dir, exist_ok=True)
