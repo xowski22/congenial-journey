@@ -21,3 +21,7 @@ class ModelInterface:
 
         self.model.load_state_dict(torch.load(model_path, map_location=device))
         self.model.eval()
+
+    def generate(self, category, variation=1.0, num_samples=1):
+        """Generate 3D models based on category and variation parameter"""
+        pass
