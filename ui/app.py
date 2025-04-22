@@ -25,3 +25,6 @@ class ModelInterface:
     def generate(self, category, variation=1.0, num_samples=1):
         """Generate 3D models based on category and variation parameter"""
         pass
+
+def create_app():
+    pass
